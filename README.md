@@ -31,13 +31,15 @@ optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  image path or directory
   -t TEXT, --text TEXT  water mart text
-  -o OUT, --out OUT     image output directory
+  -o OUT, --out OUT     image output directory, default is current directory
   -c COLOR, --color COLOR
                         text color, red、blue and so on
   -s SIZE, --size SIZE  text size
   -p POSITION, --position POSITION
-                        text position, left_top、left_bottom、right_top、ri
-                        ght_bottom、center，default is center,
+                        text position, center, left_top, left_bottom, right_top, right_bottom, center_bottom, default is right_bottom
+
+  --opacity OPACITY     watermark opacity, default is 0.5
+  --show                need show watermark image
 ```
 
 ## 使用说明
@@ -51,7 +53,10 @@ optional arguments:
   -o OUT, --out OUT             图片输出目录
   -c COLOR, --color COLOR       水印文本颜色，可以是red、blue、white等
   -s SIZE, --size SIZE          文本大小
-  -p POSITION, --position       文本位置可以是left_top、left_bottom、right_top、right_botto center，默认是center
+  -p POSITION, --position       文本位置可以是left_top、left_bottom、right_top、right_bottom center，默认是right_bottom
+
+  --opacity OPACITY             水印透明度, 默认 0.5
+  --show                        完成后是否打开
 ```
 
 比如举例一个图片，文件路径是`image/test.png`
