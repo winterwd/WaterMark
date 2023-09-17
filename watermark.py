@@ -14,8 +14,9 @@ from PIL import ImageChops
 
 
 def crop_image(im):
-    '''裁剪图片边缘空白'''
-    bg = Image.new(mode='RGBA', size=im.size)
+    """裁剪图片边缘空白"""
+
+    bg = Image.new(mode="RGBA", size=im.size)
     diff = ImageChops.difference(im, bg)
     del bg
     bbox = diff.getbbox()
@@ -30,7 +31,7 @@ def text2img(text, font_color, font_size=25):
     font = ImageFont.truetype("PingFang.ttc", font_size)
     # font = ImageFont.load_default()
     # 多行文字处理
-    text = text.split('\n')
+    text = text.split("\n")
     mark_width = 0
     height = 0
     for i in range(len(text)):
@@ -41,7 +42,7 @@ def text2img(text, font_color, font_size=25):
     mark_height = height * len(text)
 
     # 生成水印图片
-    mark = Image.new('RGBA', (mark_width, mark_height))
+    mark = Image.new("RGBA", (mark_width, mark_height))
     draw = ImageDraw.ImageDraw(mark, "RGBA")
     draw.font = font
     for i in range(len(text)):
@@ -53,9 +54,9 @@ def text2img(text, font_color, font_size=25):
 def set_opacity(im, opacity):
     """设置透明度"""
 
-    assert opacity >= 0 and opacity < 1
+    assert 0 <= opacity < 1
     if im.mode != "RGBA":
-        im = im.convert('RGBA')
+        im = im.convert("RGBA")
     else:
         im = im.copy()
     alpha = im.split()[3]
@@ -70,33 +71,33 @@ def watermark(im, mark, position, opacity=1.0):
     try:
         if opacity < 1:
             mark = set_opacity(mark, opacity)
-        if im.mode != 'RGBA':
-            im = im.convert('RGBA')
+        if im.mode != "RGBA":
+            im = im.convert("RGBA")
         if im.size[0] < mark.size[0] or im.size[1] < mark.size[1]:
             print("The mark image size is larger size than original image file.")
             return False
 
         # 设置水印位置
-        if position == 'left_top':
+        if position == "left_top":
             x = 0
             y = 0
-        elif position == 'left_bottom':
+        elif position == "left_bottom":
             x = 0
             y = im.size[1] - mark.size[1]
-        elif position == 'right_top':
+        elif position == "right_top":
             x = im.size[0] - mark.size[0]
             y = 0
-        elif position == 'right_bottom':
+        elif position == "right_bottom":
             x = im.size[0] - mark.size[0]
             y = im.size[1] - mark.size[1]
-        elif position == 'center_bottom':
+        elif position == "center_bottom":
             x = (im.size[0] - mark.size[0]) / 2
             y = im.size[1] - mark.size[1]
         else:
             x = (im.size[0] - mark.size[0]) / 2
             y = (im.size[1] - mark.size[1]) / 2
 
-        layer = Image.new('RGBA', im.size, )
+        layer = Image.new("RGBA", im.size)
         layer.paste(mark, (int(x), int(y)))
         return Image.composite(layer, im, layer)
     except Exception as e:
@@ -116,21 +117,28 @@ def add_mark(image_file, args, output):
             os.mkdir(output)
 
         new_name = os.path.join(output, name)
-        if os.path.splitext(new_name)[1] != '.png':
-            image = image.convert('RGB')
+        if os.path.splitext(new_name)[1] != ".png":
+            image = image.convert("RGB")
         image.save(new_name)
-        
-        if args.show:
-          image.show()
 
-        print("Success add `" + args.text + "` on " + image_file + " to " + os.path.abspath(new_name))
+        if args.show:
+            image.show()
+
+        print(
+            "Success add `"
+            + args.text
+            + "` on "
+            + image_file
+            + " to "
+            + os.path.abspath(new_name)
+        )
     else:
         print("Sorry, Failed.")
 
 
 def is_image_file(file_path):
     # 常见的图片文件扩展名
-    image_extensions = ['.jpg', '.jpeg', '.png']
+    image_extensions = [".jpg", ".jpeg", ".png"]
 
     # 获取文件扩展名（不包括点）
     file_extension = os.path.splitext(file_path)[1].lower()
@@ -158,12 +166,27 @@ def main():
     parse = argparse.ArgumentParser()
     parse.add_argument("-f", "--file", required=True, help="image path or directory")
     parse.add_argument("-t", "--text", required=True, type=str, help="water mart text")
-    parse.add_argument("-o", "--out", default="./", required=False, help="image output directory, default is current directory")
-    parse.add_argument("-c", "--color", default="red", type=str, help="text color, red、blue and so on")
+    parse.add_argument(
+        "-o",
+        "--out",
+        default="./",
+        required=False,
+        help="image output directory, default is current directory",
+    )
+    parse.add_argument(
+        "-c", "--color", default="red", type=str, help="text color, red、blue and so on"
+    )
     parse.add_argument("-s", "--size", default=20, type=float, help="text size")
-    parse.add_argument("-p", "--position", default="right_bottom",
-                       help="text position, center,left_top,left_bottom,right_top,right_bottom,center_bottom,default is right_bottom")
-    parse.add_argument("--opacity", default=0.5, type=float, help="watermark opacity, default is 0.5")
+    parse.add_argument(
+        "-p",
+        "--position",
+        default="right_bottom",
+        help="text position, center,left_top,left_bottom,right_top,right_bottom,center_bottom,"
+        "default is right_bottom",
+    )
+    parse.add_argument(
+        "--opacity", default=0.5, type=float, help="watermark opacity, default is 0.5"
+    )
     parse.add_argument("--show", help="need show watermark image", action="store_true")
 
     args = parse.parse_args()
@@ -176,15 +199,15 @@ def main():
         file_paths = get_all_file_paths(args.file)
         for image_file in file_paths:
             if is_image_file(image_file):
-              out = os.path.join(args.out, image_file.split(args.file)[-1])
-              out = os.path.dirname(out)
-              add_mark(image_file, args, out)
+                out = os.path.join(args.out, image_file.split(args.file)[-1])
+                out = os.path.dirname(out)
+                add_mark(image_file, args, out)
     else:
         if is_image_file(args.file):
-          add_mark(args.file, args, args.out)
+            add_mark(args.file, args, args.out)
         else:
-          print("Sorry, " + args.file + " is not a image file.")
+            print("Sorry, " + args.file + " is not a image file.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
